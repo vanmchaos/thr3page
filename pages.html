@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工资计算器2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .nav {
+            text-align: center;
+            font-size: 14px; /* 调整字体大小 */
+            color: green; /* 设置字体颜色 */
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], input[type="number"], select {
+            width: calc(100% - 22px); /* 调整输入框宽度 */
+            padding: 10px;
+            margin: 5px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="nav"><a href="index.html">一般工资计算</a>｜｜<a href="pages.html">其他工资计算</a></h1>
+        <form id="salaryForm">
+            <label for="basicSalary">基本工资:</label>
+            <input type="number" id="basicSalary" name="basicSalary" value="0" required>
+
+            <label for="overtimeRate">加班费率(元/小时):</label>
+            <input type="number" id="overtimeRate" name="overtimeRate" value="0" required>
+
+            <label for="overtimeHours">加班总时长(小时):</label>
+            <input type="number" id="overtimeHours" name="overtimeHours" value="0" required>
+
+            <label for="subsidyType1">补贴类型1:</label>
+            <select id="subsidyType1" name="subsidyType1" onchange="showSubsidyInput(1)" required>
+                <option value="">请选择</option>
+                <option value="1">餐补</option>
+                <option value="2">夜班补助</option>
+                <option value="3">岗位补助</option>
+            </select>
+            <div id="subsidyInput1" class="hidden">
+                <label for="subsidyAmount1">补贴金额:</label>
+                <input type="number" id="subsidyAmount1" name="subsidyAmount1" value="0">
+                <label for="subsidyDays1">天数:</label>
+                <input type="number" id="subsidyDays1" name="subsidyDays1" value="0">
+            </div>
+
+            <label for="subsidyType2">补贴类型2:</label>
+            <select id="subsidyType2" name="subsidyType2" onchange="showSubsidyInput(2)" required>
+                <option value="">请选择</option>
+                <option value="1">餐补</option>
+                <option value="2">夜班补助</option>
+                <option value="3">岗位补助</option>
+            </select>
+            <div id="subsidyInput2" class="hidden">
+                <label for="subsidyAmount2">补贴金额:</label>
+                <input type="number" id="subsidyAmount2" name="subsidyAmount2" value="0">
+                <label for="subsidyDays2">天数:</label>
+                <input type="number" id="subsidyDays2" name="subsidyDays2" value="0">
+            </div>
+
+            <label for="subsidyType3">补贴类型3:</label>
+            <select id="subsidyType3" name="subsidyType3" onchange="showSubsidyInput(3)" required>
+                <option value="">请选择</option>
+                <option value="1">餐补</option>
+                <option value="2">夜班补助</option>
+                <option value="3">岗位补助</option>
+            </select>
+            <div id="subsidyInput3" class="hidden">
+                <label for="subsidyAmount3">补贴金额:</label>
+                <input type="number" id="subsidyAmount3" name="subsidyAmount3" value="0">
+                <label for="subsidyDays3">天数:</label>
+                <input type="number" id="subsidyDays3" name="subsidyDays3" value="0">
+            </div>
+
+            <label for="otherSubsidy">其他补贴金额:</label>
+            <input type="number" id="otherSubsidy" name="otherSubsidy" value="0" required>
+
+            <label for="performanceBonus">绩效奖金额:</label>
+            <input type="number" id="performanceBonus" name="performanceBonus" value="0" required>
+
+            <label for="otherDeductions">其他扣款金额:</label>
+            <input type="number" id="otherDeductions" name="otherDeductions" value="0" required>
+
+            <button type="button" onclick="calculateSalary()">计算总工资</button>
+        </form>
+        <div class="result" id="result"></div>
+        <div class="note">本页面可以计算小时工工资和其它非常规方式的工资计算。</div>
+        <p>有问题联系我 <a href="mailto:van2025@yeah.net">点击这里</a></p>
+
+
+    </div>
+
+    <script>
+        function showSubsidyInput(index) {
+            const subsidyType = document.getElementById(`subsidyType${index}`).value;
+            const subsidyInput = document.getElementById(`subsidyInput${index}`);
+            const subsidyDaysInput = document.getElementById(`subsidyDays${index}`);
+
+            // 显示补贴金额输入框
+            subsidyInput.classList.remove("hidden");
+            subsidyDaysInput.classList.remove("hidden");
+
+            // 处理不同补贴类型的显示逻辑
+            if (subsidyType === "1" || subsidyType === "2") {
+                subsidyDaysInput.classList.remove("hidden"); // 显示天数输入框
+            } else if (subsidyType === "3") {
+                subsidyDaysInput.classList.add("hidden"); // 隐藏天数输入框
+            } else {
+                subsidyInput.classList.add("hidden"); // 隐藏补贴输入框
+                subsidyDaysInput.classList.add("hidden"); // 隐藏天数输入框
+            }
+        }
+
+        function calculateSalary() {
+            const basicSalary = parseFloat(document.getElementById('basicSalary').value);
+            const overtimeRate = parseFloat(document.getElementById('overtimeRate').value);
+            const overtimeHours = parseFloat(document.getElementById('overtimeHours').value);
+            const otherSubsidy = parseFloat(document.getElementById('otherSubsidy').value);
+            const performanceBonus = parseFloat(document.getElementById('performanceBonus').value);
+            const otherDeductions = parseFloat(document.getElementById('otherDeductions').value);
+
+            let livingSubsidy = 0;
+
+            for (let i = 1; i <= 3; i++) {
+                const subsidyType = parseInt(document.getElementById(`subsidyType${i}`).value);
+                const subsidyAmount = parseFloat(document.getElementById(`subsidyAmount${i}`).value) || 0;
+                const subsidyDays = parseInt(document.getElementById(`subsidyDays${i}`).value) || 0;
+
+                if (subsidyType === 1 || subsidyType === 2) {
+                    livingSubsidy += subsidyAmount * subsidyDays;
+                } else if (subsidyType === 3) {
+                    livingSubsidy += subsidyAmount; // 仅加上补贴金额
+                }
+            }
+
+            const totalSalary = basicSalary + (overtimeRate * overtimeHours) + livingSubsidy + otherSubsidy + performanceBonus - otherDeductions;
+
+            document.getElementById('result').innerText = `总工资为: ${totalSalary.toFixed(2)}元`;
+        }
+    </script>
+</body>
+</html>
